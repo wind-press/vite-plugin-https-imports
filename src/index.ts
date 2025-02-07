@@ -6,18 +6,19 @@ import { resolver } from './resolver'
 import { loader } from './loader'
 
 
-export default function(options: HttpsImportsOptions = {}): Plugin {
-  const match = matcher(options)
+export default function(options: HttpsImportsOptions = {}, customResolver, customLoader, customMatcher): Plugin {
+  const match = customMatcher ? customMatcher(options) : matcher(options)
 
   return {
     name: 'vite-plugin-https-imports',
     enforce: 'pre',
     apply: 'build',
 
-    resolveId: resolver(match),
-    load: loader(match, options),
+    resolveId: customResolver ? customResolver(match) : resolver(match),
+    load: customLoader ? customLoader(match, options) : loader(match, options),
   }
 }
 
 
 export * from './types'
+export { matcher, resolver, loader }
